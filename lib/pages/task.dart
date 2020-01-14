@@ -151,7 +151,7 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
                   valueListenable: curPos,
                   builder: (context, NavData val, _) {
                     return Text(
-                      "You are ${val.distance} from the task location",
+                      "You are ${val.distance} ${val.distance.endsWith('range')  ? 'of' : 'from'} the task location",
                     );
                   },
                 ),

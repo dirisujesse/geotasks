@@ -50,8 +50,8 @@ String parseDistance(
   if ((result["distance"] as double) < (result["smallBorder"] as double)) {
     distance =
         (result["distance"] as double) * (result["factor"] as int);
-    if (distance < 50) {
-      return "less than ${result["smallUnit"]} away";
+    if (distance <= 20) {
+      return "within camera range";
     } else {
       distance = distance / 50 * 50.0;
       return "${distance.toStringAsFixed(2)} ${result["smallUnit"]} away";
