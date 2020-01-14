@@ -6,7 +6,7 @@ class HttpService {
   static List<dynamic> crudeCache;
   static DateTime lastCacheTime; 
   static Dio http = new Dio(
-    BaseOptions(connectTimeout: 1000 * 120),
+    BaseOptions(connectTimeout: 1000 * 5, receiveTimeout: 1000 * 5),
   );
   static String url =
       "https://maps.googleapis.com/maps/api/place/nearbysearch/json";

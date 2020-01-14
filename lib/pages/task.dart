@@ -31,7 +31,7 @@ class TaskPage extends StatefulWidget {
   }
 }
 
-class _TaskPageState extends State<TaskPage> {
+class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
   Completer<GoogleMapController> _controller = Completer();
   // GoogleMapController _ctrl;
   ValueNotifier<NavData> curPos;
@@ -42,8 +42,8 @@ class _TaskPageState extends State<TaskPage> {
 
   @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
-    _trackPos();
   }
 
   _launchURL(double lat, double long, Map<String, dynamic> dest) async {
@@ -76,12 +76,22 @@ class _TaskPageState extends State<TaskPage> {
   }
 
   void _trackPos() async {
-    tracker = Geolocator().getPositionStream().listen((Position pos) async {
+    tracker = Geolocator()
+        .getPositionStream(
+      LocationOptions(
+        accuracy: LocationAccuracy.best,
+        distanceFilter: 4,
+        timeInterval: 1000,
+      ),
+    )
+        .listen((Position pos) async {
       try {
         double dist = await Geolocator().distanceBetween(
             pos.latitude, pos.longitude, widget.task.lat, widget.task.long);
-        curPos.value =
-            NavData(position: pos, distance: parseDistance(dist, isRaw: true));
+        curPos.value = NavData(
+          position: pos,
+          distance: parseDistance(dist, isRaw: true),
+        );
       } catch (e) {
         print(e);
       }
@@ -90,6 +100,9 @@ class _TaskPageState extends State<TaskPage> {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((interval) {
+      _trackPos();
+    });
     return Scaffold(
       floatingActionButton: ValueListenableBuilder(
         valueListenable: curPos,
@@ -247,10 +260,10 @@ class _TaskPageState extends State<TaskPage> {
 
   @override
   void dispose() {
-    // if (_ctrl != null) {
-    //   _
-    // }
-    tracker.cancel();
+    if (tracker != null) {
+      tracker.cancel();
+    }
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 }
